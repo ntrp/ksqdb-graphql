@@ -1,4 +1,7 @@
 import { FieldNode, GraphQLResolveInfo } from 'graphql';
+import { firstValueFrom } from 'rxjs';
+import { map } from 'rxjs/operators';
+import toAsyncIterable from 'observable-to-async-generator';
 
 import {
   Resolver,
@@ -148,7 +151,7 @@ export class ResolverGenerator {
     if (!node || !node.selectionSet) {
       return null;
     }
-    const command = [];
+    const command: string[] = [];
     const selections: Array<FieldNode> = node.selectionSet.selections as Array<FieldNode>;
 
     const fields = this.getFields(selections);
@@ -180,31 +183,7 @@ export class ResolverGenerator {
     if (!sql) {
       return null;
     }
-    console.log(sql);
-
-    /*
-    const stream = asyncIteratorQueryStream(ksqlDB.session, { sql }, 'query');
-    for await (const row of stream) {
-      // both of these are possible, seems like a bug in @ksqldb/client
-      // { query: { COUNT: { value: [Array], done: true } } }
-      // { query: { COUNT: 1 } }
-      const { query } = row;
-      return Object.keys(query).reduce((accum: any, qry) => {
-        if (query[qry].done) {
-          const { value } = query[qry];
-          try {
-            const parsedVal = JSON.parse(value[0]);
-            accum[qry] = parsedVal[0]; // maybe?
-          } catch (e) {
-            // eslint-disable-next-line
-            console.error(e);
-          }
-        } else {
-          accum[qry] = query[qry];
-        }
-        return accum;
-      }, {});
-    }*/
+    return await firstValueFrom(ksqlDBClient.queryStream<any>({ sql }));
   };
 
   /*
@@ -216,10 +195,9 @@ export class ResolverGenerator {
     if (!sql) {
       return Promise.resolve(new Error('Unable to generate ksqlDB from graphql statement.'));
     }
+
     const nameKey = getNameFromResolveInfo(info) as string;
-    console.log(nameKey);
-    //const stream = asyncIteratorQueryStream(ksqlDB.session, { sql }, nameKey);
-    return null;
+    return toAsyncIterable(ksqlDBClient.queryStream<any>({ sql }).pipe(map(val => ({ [nameKey]: val }))));
   };
 
   /*

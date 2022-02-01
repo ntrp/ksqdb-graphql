@@ -892,7 +892,7 @@
 "@ntrp/ksqldb-client@file:../ksqldb-client":
   version "0.1.0"
   dependencies:
-    http2-client "^1.3.5"
+    ndjson "^2.0.0"
     rxjs "^7.5.2"
 
 "@octokit/auth-token@^2.4.4":
@@ -1698,15 +1698,6 @@ apollo-server-types@^3.5.1:
     apollo-reporting-protobuf "^3.3.0"
     apollo-server-caching "^3.3.0"
     apollo-server-env "^4.2.1"
-
-apollo-server@^3.6.2:
-  version "3.6.2"
-  resolved "https://registry.yarnpkg.com/apollo-server/-/apollo-server-3.6.2.tgz#7acf37658a4438a46cf510e026ab82fd354825f9"
-  integrity sha512-siObsC0F1IfZIjhZpRq2TSjNHpEX8Hi1VHZc7gjTifAJ5CH+S0GY5MRt8PjhoxhQq4/0DIlzHEcOofydLnQ0PA==
-  dependencies:
-    apollo-server-core "^3.6.2"
-    apollo-server-express "^3.6.2"
-    express "^4.17.1"
 
 "aproba@^1.0.3 || ^2.0.0", aproba@^2.0.0:
   version "2.0.0"
@@ -2931,7 +2922,7 @@ expect@^27.4.6:
     jest-matcher-utils "^27.4.6"
     jest-message-util "^27.4.6"
 
-express@^4.17.1:
+express@^4.17.2:
   version "4.17.2"
   resolved "https://registry.yarnpkg.com/express/-/express-4.17.2.tgz#c18369f265297319beed4e5558753cc8c1364cb3"
   integrity sha512-oxlxJxcQlYwqPWKVJJtvQiwHgosH/LrLSPA+H4UxpyvSS6jC5aH+5MoHFM+KABgTOt0APue4w66Ha8jCUo9QGg==
@@ -3366,6 +3357,11 @@ graphql-tag@^2.11.0:
   dependencies:
     tslib "^2.1.0"
 
+graphql-ws@^5.5.5:
+  version "5.5.5"
+  resolved "https://registry.yarnpkg.com/graphql-ws/-/graphql-ws-5.5.5.tgz#f375486d3f196e2a2527b503644693ae3a8670a9"
+  integrity sha512-hvyIS71vs4Tu/yUYHPvGXsTgo0t3arU820+lT5VjZS2go0ewp2LqyCgxEN56CzOG7Iys52eRhHBiD1gGRdiQtw==
+
 graphql@^16.3.0:
   version "16.3.0"
   resolved "https://registry.yarnpkg.com/graphql/-/graphql-16.3.0.tgz#a91e24d10babf9e60c706919bb182b53ccdffc05"
@@ -3501,11 +3497,6 @@ http-signature@~1.2.0:
     assert-plus "^1.0.0"
     jsprim "^1.2.2"
     sshpk "^1.7.0"
-
-http2-client@^1.3.5:
-  version "1.3.5"
-  resolved "https://registry.yarnpkg.com/http2-client/-/http2-client-1.3.5.tgz#20c9dc909e3cc98284dd20af2432c524086df181"
-  integrity sha512-EC2utToWl4RKfs5zd36Mxq7nzHHBuomZboI0yYL6Y0RmBgT7Sgkq4rQ0ezFTYoIsSs7Tm9SJe+o2FcAg6GBhGA==
 
 https-proxy-agent@^5.0.0:
   version "5.0.0"
@@ -5061,6 +5052,17 @@ natural-compare@^1.4.0:
   resolved "https://registry.yarnpkg.com/natural-compare/-/natural-compare-1.4.0.tgz#4abebfeed7541f2c27acfb29bdbbd15c8d5ba4f7"
   integrity sha1-Sr6/7tdUHywnrPspvbvRXI1bpPc=
 
+ndjson@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/ndjson/-/ndjson-2.0.0.tgz#320ac86f6fe53f5681897349b86ac6f43bfa3a19"
+  integrity sha512-nGl7LRGrzugTtaFcJMhLbpzJM6XdivmbkdlaGcrk/LXg2KL/YBC6z1g70xh0/al+oFuVFP8N8kiWRucmeEH/qQ==
+  dependencies:
+    json-stringify-safe "^5.0.1"
+    minimist "^1.2.5"
+    readable-stream "^3.6.0"
+    split2 "^3.0.0"
+    through2 "^4.0.0"
+
 negotiator@0.6.2:
   version "0.6.2"
   resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-0.6.2.tgz#feacf7ccf525a77ae9634436a64883ffeca346fb"
@@ -5350,6 +5352,11 @@ object-inspect@^1.12.0:
   version "1.12.0"
   resolved "https://registry.yarnpkg.com/object-inspect/-/object-inspect-1.12.0.tgz#6e2c120e868fd1fd18cb4f18c31741d0d6e776f0"
   integrity sha512-Ho2z80bVIvJloH+YzRmpZVQe87+qASmBUKZDWgx9cu+KDrX2ZDH/3tMy+gXbZETVGs2M8YdxObOh7XAtim9Y0g==
+
+observable-to-async-generator@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/observable-to-async-generator/-/observable-to-async-generator-1.0.2.tgz#e29a3a99395d960ebb714ebca8bd8f6a90a5148a"
+  integrity sha512-ssGgv9x82dD2fM/lrCwgWaYQpvMXi+wCzrnVFbZI92P2JKsJRyZV7F72ZoKHM3/bE7YS+Wq54SbtV1Y16xikhg==
 
 on-finished@~2.3.0:
   version "2.3.0"
@@ -7259,6 +7266,11 @@ ws@^7.4.6:
   version "7.5.6"
   resolved "https://registry.yarnpkg.com/ws/-/ws-7.5.6.tgz#e59fc509fb15ddfb65487ee9765c5a51dec5fe7b"
   integrity sha512-6GLgCqo2cy2A2rjCNFlxQS6ZljG/coZfZXclldI8FB/1G3CCI36Zd8xy2HrFVACi8tfk5XrgLQEk+P0Tnz9UcA==
+
+ws@^8.4.2:
+  version "8.4.2"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-8.4.2.tgz#18e749868d8439f2268368829042894b6907aa0b"
+  integrity sha512-Kbk4Nxyq7/ZWqr/tarI9yIt/+iNNFOjBXEWgTb4ydaNHBNGgvf2QHbS9fdfsndfjFlFwEd4Al+mw83YkaD10ZA==
 
 xml-name-validator@^3.0.0:
   version "3.0.0"

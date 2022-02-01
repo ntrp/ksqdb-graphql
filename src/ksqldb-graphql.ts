@@ -1,43 +1,69 @@
+import express from "express";
+import ws from 'ws';
+import { ApolloServer } from "apollo-server-express";
+import { useServer } from 'graphql-ws/lib/use/ws';
 import { addResolversToSchema } from "@graphql-tools/schema";
 import { KsqlDBClient } from "@ntrp/ksqldb-client";
-import { ApolloServer } from "apollo-server";
 import { buildKsqlDBGraphQL } from "./schema";
+import { createServer } from "http";
 
-const ksqlDBClient = new KsqlDBClient("http://localhost:8088")
+const ksqlDBClient = new KsqlDBClient("http://localhost:8088");
 
-buildKsqlDBGraphQL({
-  ksqlDBClient
-}).then(
-  ({ schemas, queryResolvers, subscriptionResolvers, mutationResolvers }) => {
-    const server = new ApolloServer({
-      context: async (): Promise<any> => ({
-        ksqlDBClient,
-      }),
-      schema: addResolversToSchema({
+(async function() {
+  buildKsqlDBGraphQL({
+    ksqlDBClient
+  })
+    .then(async ({ schemas, queryResolvers, subscriptionResolvers, mutationResolvers }) => {
+      const app = express();
+
+      const server = createServer(app);
+
+      const schema = addResolversToSchema({
         schema: schemas,
         resolvers: {
-          //Subscription: subscriptionResolvers,
+          Subscription: subscriptionResolvers,
           Query: queryResolvers,
           Mutation: mutationResolvers,
         }
-      }),
-    });
+      })
 
-    const options = { port: 4000, host: 'localhost' };
-    const host = process.env.API_HOST;
-    const port = process.env.API_PORT;
-    if (host != null) {
-      options.host = host;
-    }
-    if (port != null) {
-      options.port = parseInt(port, 10);
-    }
+      const apollo = new ApolloServer({
+        context: async (): Promise<any> => ({
+          ksqlDBClient,
+        }),
+        schema,
+        plugins: [{
+          async serverWillStart() {
+            return {
+              async drainServer() {
+                //subscriptionServer.close();
+              }
+            };
+          }
+        }],
+      });
 
-    server.listen(options).then(({ url, subscriptionsUrl }: any) => {
-      // eslint-disable-next-line
-      console.log(`🚀 Server ready at ${url}`);
-      // eslint-disable-next-line
-      console.log(`🚀 Subscriptions ready at ${subscriptionsUrl} `);
+      await apollo.start();
+      apollo.applyMiddleware({ app });
+
+      const PORT = 4000;
+      server.listen({ port: PORT }, () => {
+
+        // create and use the websocket server
+        const wsServer = new ws.Server({
+          server,
+          path: '/graphql',
+        });
+
+        useServer({
+          schema,
+          context: {
+            ksqlDBClient
+          }
+        }, wsServer);
+
+        console.log(`\nServer ready at http://localhost:${PORT}${apollo.graphqlPath}`)
+        console.log(`Subscriptions ready at ws://localhost:${PORT}${apollo.graphqlPath}`)
+      });
     });
-  }
-);
+})();

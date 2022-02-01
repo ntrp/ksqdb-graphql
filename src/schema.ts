@@ -32,7 +32,7 @@ const TypeMap = {
     BOOLEAN: new GraphQLList(GraphQLBoolean),
   },
   STRUCT: {}, // MemberSchema exclude not excluding this?
-};
+} as any;
 
 const setSchemaType = (accum: KSqlDBEntities, field: Field): void => {
   if (TypeMap[field.schema.type] == null) {
@@ -199,7 +199,6 @@ const schemas = async ({
     if (sources.length === 0) {
       throw new Error('No Stream or Table exists on the server');
     }
-
 
     return generateSchemaAndFields(sources as any);
   } catch (e: any) {

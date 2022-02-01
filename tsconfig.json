@@ -13,8 +13,10 @@
     "sourceMap": true,
     "declaration": true,
     "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "noImplicitAny": false,
     "declarationDir": "dist/types",
     "outDir": "dist/lib",
     "typeRoots": [
