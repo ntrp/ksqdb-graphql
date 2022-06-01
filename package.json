@@ -9,7 +9,7 @@
   ],
   "main": "dist/ksqldb-graphql.cjs.js",
   "module": "dist/ksqldb-graphql.es5.js",
-  "types": "dist/types/ksqldb-graphql.d.ts",
+  "types": "dist/types/src/ksqldb-graphql.d.ts",
   "files": [
     "dist"
   ],

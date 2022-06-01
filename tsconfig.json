@@ -25,7 +25,7 @@
   },
   "include": [
     "src",
-    // fix issues with rollup build
+    // fix issues with rollup build (this forces me also to keep the src folder in the types)
     "node_modules/@josephg/resolvable"
   ]
 }
