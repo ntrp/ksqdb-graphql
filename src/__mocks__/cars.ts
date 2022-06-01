@@ -67,7 +67,7 @@ export const carsPayload = [
     statement:
       "CREATE TABLE CARS_COUNT WITH (KAFKA_TOPIC='CARS_COUNT', PARTITIONS=1, REPLICAS=1) AS SELECT COUNT(*) COUNT\nFROM CARS CARS\nGROUP BY CARS.ROWKEY\nEMIT CHANGES;",
   },
-];
+]
 
 export const carSchemaResult = `type CARS {
   ROWTIME: Float
@@ -101,4 +101,4 @@ type Subscription {
   CARS(ROWTIME: Float, ROWKEY: String, ID: String, LAT: Float, LONG: Float): CARS
   CARS_COUNT(ROWTIME: Float, ROWKEY: String, COUNT: Float): CARS_COUNT
 }
-`;
+`

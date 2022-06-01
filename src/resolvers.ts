@@ -1,14 +1,14 @@
-import { FieldNode, GraphQLResolveInfo } from 'graphql';
-import { firstValueFrom } from 'rxjs';
-import { map } from 'rxjs/operators';
-import toAsyncIterable from 'observable-to-async-generator';
+import { FieldNode, GraphQLResolveInfo } from 'graphql'
+import { firstValueFrom } from 'rxjs'
+import { map } from 'rxjs/operators'
+import toAsyncIterable from 'observable-to-async-generator'
 
 import {
   Resolver,
   SubscriptionResolver,
   ResolverFields,
   KsqlDBGraphResolver,
-} from './type/definition';
+} from './type/definition'
 
 /*
  * Example graphQL:
@@ -23,48 +23,47 @@ import {
  */
 const getNameFromResolveInfo = (info: GraphQLResolveInfo): string | null => {
   // TODO support multiple field nodes
-  const node = info.fieldNodes[0];
+  const node = info.fieldNodes[0]
   if (!node || !node.selectionSet) {
-    return null;
+    return null
   }
 
-  return escape(node.name.value);
-};
+  return escape(node.name.value)
+}
 
-const createResolver = (resolver: KsqlDBGraphResolver) => (
-  resolvers: Resolver,
-  key: string
-): Resolver => {
-  resolvers[key] = resolver;
-  return resolvers;
-};
+const createResolver =
+  (resolver: KsqlDBGraphResolver) =>
+  (resolvers: Resolver, key: string): Resolver => {
+    resolvers[key] = resolver
+    return resolvers
+  }
 
 export const createInsertStatement = (
   info: GraphQLResolveInfo,
   args: { [key: string]: string | number }
 ): string | null => {
   // TODO what about multiple field nodes?
-  const node = info.fieldNodes[0];
+  const node = info.fieldNodes[0]
   if (!node || !node.selectionSet) {
-    return null;
+    return null
   }
 
-  const name = getNameFromResolveInfo(info);
-  const keys = Object.keys(args).map(key => escape(key));
+  const name = getNameFromResolveInfo(info)
+  const keys = Object.keys(args).map((key) => escape(key))
   // this seems bad, but maybe it's ok
-  const values = Object.values(args).map(val =>
+  const values = Object.values(args).map((val) =>
     typeof val === 'string' ? `'${escape(val)}'` : val
-  );
-  const command = `INSERT INTO ${name} (${keys.join(', ')}) VALUES (${values.join(', ')});`;
-  return command;
-};
+  )
+  const command = `INSERT INTO ${name} (${keys.join(', ')}) VALUES (${values.join(', ')});`
+  return command
+}
 
 export class ResolverGenerator {
   /*
    * A list of fields available in ksqlDB
    * Used to filter out an internal graphql stuff that could affect query generation
    */
-  whitelistFields: Set<string> = new Set();
+  whitelistFields: Set<string> = new Set()
 
   /*
    * A map of resolvers for the `Query` in graphql
@@ -72,13 +71,13 @@ export class ResolverGenerator {
    * it is also https://docs.ksqldb.io/en/latest/concepts/queries/pull/
    * Right now, these are not supported
    */
-  queryResolvers = {};
+  queryResolvers = {}
 
   /*
    * A map of resolvers for the `Mutation` in graphql
    * in ksqlDB, this would be an INSERT INTO https://docs.ksqldb.io/en/latest/concepts/collections/inserting-events/
    */
-  mutationResolvers = {};
+  mutationResolvers = {}
 
   /*
    * A map of resolvers for the `Subscription` in graphql
@@ -86,21 +85,21 @@ export class ResolverGenerator {
    * based on https://www.apollographql.com/docs/graphql-subscriptions/subscriptions-to-schema/
    * it should be a map of a single `subscribe` key with a function to resolve
    */
-  subscriptionResolvers = {};
+  subscriptionResolvers = {}
 
   constructor(protected fields: ResolverFields) {
-    const { queryFields, subscriptionFields, mutationFields } = fields;
-    const queries: Array<string> = Object.keys(queryFields);
-    const mutations: Array<string> = Object.keys(mutationFields);
-    const subscriptions: Array<string> = Object.keys(subscriptionFields);
+    const { queryFields, subscriptionFields, mutationFields } = fields
+    const queries: Array<string> = Object.keys(queryFields)
+    const mutations: Array<string> = Object.keys(mutationFields)
+    const subscriptions: Array<string> = Object.keys(subscriptionFields)
     queries.concat(subscriptions, mutations).reduce((accum: Set<string>, key: any) => {
-      let args;
+      let args
       if (queryFields[key]) {
-        args = queryFields[key].args;
+        args = queryFields[key].args
       } else if (subscriptionFields[key]) {
-        args = subscriptionFields[key].args;
+        args = subscriptionFields[key].args
       } else if (mutationFields[key]) {
-        args = mutationFields[key].args;
+        args = mutationFields[key].args
       }
 
       if (args) {
@@ -108,19 +107,19 @@ export class ResolverGenerator {
           accum.add(key)
         })
       }
-      return accum;
-    }, this.whitelistFields);
-    this.queryResolvers = queries.reduce(createResolver(this.handleQueryResolve), {});
-    this.mutationResolvers = mutations.reduce(createResolver(this.handleMutationResolve), {});
+      return accum
+    }, this.whitelistFields)
+    this.queryResolvers = queries.reduce(createResolver(this.handleQueryResolve), {})
+    this.mutationResolvers = mutations.reduce(createResolver(this.handleMutationResolve), {})
     this.subscriptionResolvers = subscriptions.reduce(
       (resolvers: SubscriptionResolver, key: string) => {
         resolvers[key] = {
           subscribe: this.handleSubscriptionResolve,
-        };
-        return resolvers;
+        }
+        return resolvers
       },
       {}
-    );
+    )
   }
 
   /*
@@ -131,12 +130,12 @@ export class ResolverGenerator {
       // __typename is part of these selections. enforce only using ksql fields as a response
       .filter(({ name }: FieldNode) => this.whitelistFields.has(name.value))
       .map(({ name }: FieldNode) => {
-        return escape(name.value);
-      });
+        return escape(name.value)
+      })
     if (fields.length === 0) {
-      throw new Error('No ksqlDB fields available.');
+      throw new Error('No ksqlDB fields available.')
     }
-    return fields;
+    return fields
   }
 
   /*
@@ -147,30 +146,30 @@ export class ResolverGenerator {
     args: { [key: string]: string }
   ): string | null => {
     // TODO what about multiple field nodes?
-    const node = info.fieldNodes[0];
+    const node = info.fieldNodes[0]
     if (!node || !node.selectionSet) {
-      return null;
+      return null
     }
-    const command: string[] = [];
-    const selections: Array<FieldNode> = node.selectionSet.selections as Array<FieldNode>;
+    const command: string[] = []
+    const selections: Array<FieldNode> = node.selectionSet.selections as Array<FieldNode>
 
-    const fields = this.getFields(selections);
-    const name = getNameFromResolveInfo(info);
-    command.push(`select ${fields.join(', ')} from ${name}`);
+    const fields = this.getFields(selections)
+    const name = getNameFromResolveInfo(info)
+    command.push(`select ${fields.join(', ')} from ${name}`)
 
     // Add where clause
-    const whereArguments = Object.keys(args);
+    const whereArguments = Object.keys(args)
     if (whereArguments.length > 0) {
       command.push(
         `where ${whereArguments
-          .map(key => {
-            return `${key}='${escape(args[key])}'`;
+          .map((key) => {
+            return `${key}='${escape(args[key])}'`
           })
           .join(' and ')}`
-      );
+      )
     }
-    return `${command.join(' ')}`;
-  };
+    return `${command.join(' ')}`
+  }
 
   /*
    * To generate pull queries, the underlying ksqlDB stream/table must be materialized
@@ -178,36 +177,44 @@ export class ResolverGenerator {
    * https://docs.ksqldb.io/en/latest/concepts/queries/pull/#pull-query-features-and-limitations
    * a generic form of these does not really exist (eg taking the latest of every field) - https://github.com/confluentinc/ksql/issues/3985
    */
-  handleQueryResolve: KsqlDBGraphResolver = async (obj, args, { ksqlDBClient }, info): Promise<any> => {
-    const sql = `${this.generateStatement(info, args)};`;
+  handleQueryResolve: KsqlDBGraphResolver = async (
+    obj,
+    args,
+    { ksqlDBClient },
+    info
+  ): Promise<any> => {
+    const sql = `${this.generateStatement(info, args)};`
     if (!sql) {
-      return null;
+      return null
     }
-    return await firstValueFrom(ksqlDBClient.queryStream<any>({ sql }));
-  };
+    console.log(sql)
+    return await firstValueFrom(ksqlDBClient.queryStream<any>({ sql }))
+  }
 
   /*
    * Modifies the generic ksql statement and converts it into a push query
    */
   handleSubscriptionResolve: KsqlDBGraphResolver = async (obj, args, { ksqlDBClient }, info) => {
-    const sql = `${this.generateStatement(info, args)} emit changes;`;
+    const sql = `${this.generateStatement(info, args)} emit changes;`
 
     if (!sql) {
-      return Promise.resolve(new Error('Unable to generate ksqlDB from graphql statement.'));
+      return Promise.resolve(new Error('Unable to generate ksqlDB from graphql statement.'))
     }
 
-    const nameKey = getNameFromResolveInfo(info) as string;
-    return toAsyncIterable(ksqlDBClient.queryStream<any>({ sql }).pipe(map(val => ({ [nameKey]: val }))));
-  };
+    const nameKey = getNameFromResolveInfo(info) as string
+    return toAsyncIterable(
+      ksqlDBClient.queryStream<any>({ sql }).pipe(map((val) => ({ [nameKey]: val })))
+    )
+  }
 
   /*
    * Creates insert statements to add new messages
    */
   handleMutationResolve: KsqlDBGraphResolver = async (obj, args, { ksqlDBClient }, info) => {
-    const command = createInsertStatement(info, args);
+    const command = createInsertStatement(info, args)
     try {
       if (!command) {
-        throw new Error('Unable to create insert statement from graphql args');
+        throw new Error('Unable to create insert statement from graphql args')
       }
       /*
       const response = await ddl(session, { ksql: command });
@@ -218,12 +225,12 @@ export class ResolverGenerator {
         return { command, statusCode: response.statusCode };
       }
       */
-      return { command, statusCode: 200 };//response && response.statusCode };
+      return { command, statusCode: 200 } //response && response.statusCode };
     } catch (e: any) {
       if (e.response) {
-        throw new Error(e.response.data.message);
+        throw new Error(e.response.data.message)
       }
-      throw new Error(e);
+      throw new Error(e)
     }
-  };
+  }
 }

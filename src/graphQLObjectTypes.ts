@@ -1,4 +1,4 @@
-import { GraphQLString, GraphQLObjectType, GraphQLScalarType } from 'graphql';
+import { GraphQLString, GraphQLObjectType, GraphQLScalarType } from 'graphql'
 
 export const Missing = {
   name: 'Missing data',
@@ -7,16 +7,16 @@ export const Missing = {
     description:
       'No materalized views have been registered. Register materialized views in order to use pull queries. Refer to https://cnfl.io/queries for info on query types.',
     serialize(): null {
-      return null;
+      return null
     },
     parseValue(): null {
-      return null;
+      return null
     },
     parseLiteral(): null {
-      return null;
+      return null
     },
   }),
-};
+}
 
 export const KsqlDBMutation = new GraphQLObjectType({
   name: `KsqlDBMutation`,
@@ -28,4 +28,4 @@ export const KsqlDBMutation = new GraphQLObjectType({
       type: GraphQLString,
     },
   },
-});
+})

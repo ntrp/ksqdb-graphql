@@ -164,7 +164,7 @@ export const processingLogPayload = [
       },
     ],
   },
-];
+]
 export const processingLogResult = `type DESERIALIZATIONERROR {
   ERRORMESSAGE: String
   RECORDB64: String
@@ -219,4 +219,4 @@ type RECORDPROCESSINGERROR {
 type Subscription {
   KSQL_PROCESSING_LOG(ROWTIME: Float, ROWKEY: String, LOGGER: String, LEVEL: String, TIME: Float): KSQL_PROCESSING_LOG
 }
-`;
+`
