@@ -1,6 +1,6 @@
 {
   "name": "ksqldb-graphql",
-  "version": "0.1.0",
+  "version": "1.0.3",
   "description": "A fully automatic GraphQL API generator for the KsqlDB REST API",
   "keywords": [
     "Ksql",
